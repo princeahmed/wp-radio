@@ -10,13 +10,13 @@ defined( 'ABSPATH' ) || exit();
 <div class="wp-radio-sidebar">
 
     <div class="sidebar-header <?php echo ! empty( $_REQUEST['keyword'] ) ? 'search' : ''; ?>">
-        <div class="title"><?php _e( 'Country', 'wp-radio' ); ?></div>
-        <div class="filter">
-            <form action="" method="get">
-                <input type="search" name="keyword" placeholder="Enter station name" required value="<?php echo ! empty( $_REQUEST['keyword'] ) ? esc_attr( $_REQUEST['keyword'] ) : ''; ?>">
-            </form>
-            <span class="dashicons dashicons-search"></span>
-        </div>
+        <div class="title"><?php _e( 'Countries', 'wp-radio' ); ?></div>
+<!--        <div class="filter">-->
+<!--            <form action="" method="get">-->
+<!--                <input type="search" name="keyword" placeholder="--><?php //_e('Enter station name', 'wp-radio'); ?><!--" required value="--><?php //echo ! empty( $_REQUEST['keyword'] ) ? esc_attr( $_REQUEST['keyword'] ) : ''; ?><!--">-->
+<!--            </form>-->
+<!--            <span class="dashicons dashicons-search"></span>-->
+<!--        </div>-->
     </div>
 
     <ul class="sidebar-listing">

@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit();
 function wp_radio_frontend_scripts( $hook ) {
 
 	/* register frontend styles */
-	wp_register_style( 'wp-radio', WP_RADIO_ASSETS_URL . '/frontend.min.css', false, WP_RADIO_VERSION );
+	wp_register_style( 'wp-radio', WP_RADIO_ASSETS_URL . '/css/frontend.min.css', false, WP_RADIO_VERSION );
 
 	/* register frontend scripts */
 
@@ -25,8 +25,8 @@ function wp_radio_frontend_scripts( $hook ) {
 
 	/* enqueue frontend script */
 	wp_enqueue_script( 'jquery-ui-slider' );
-	wp_enqueue_script( 'jquery.jplayer', WP_RADIO_ASSETS_URL . '/jquery.jplayer.min.js', [ 'jquery' ], '2.9.2', true );
-	wp_enqueue_script( 'wp-radio', WP_RADIO_ASSETS_URL . '/frontend.min.js', array(
+	wp_enqueue_script( 'jquery.jplayer', WP_RADIO_ASSETS_URL . '/js/jquery.jplayer.min.js', [ 'jquery' ], '2.9.2', true );
+	wp_enqueue_script( 'wp-radio', WP_RADIO_ASSETS_URL . '/js/frontend.min.js', array(
 		'jquery',
 		'jquery-ui-slider',
 		'jquery.jplayer',
@@ -35,9 +35,9 @@ function wp_radio_frontend_scripts( $hook ) {
 
 	/* create localized JS array */
 	$localized_array = array(
-		'ajax'               => admin_url( 'admin-ajax.php' ),
-		'nonce'              => wp_create_nonce( 'wp-radio' ),
-		'search_placeholder' => __( 'Field can\'t be empty', 'wp-radio' ),
+		'ajax'  => admin_url( 'admin-ajax.php' ),
+		'nonce' => wp_create_nonce( 'wp-radio' ),
+		'isPremium' => wr_fs()->can_use_premium_code__premium_only() ? true : false,
 	);
 
 	/* localized script attached to 'wp-radio' */

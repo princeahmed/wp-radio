@@ -1,39 +1,20 @@
 <?php
 /**
  * Plugin Name: WP Radio
- * Plugin URI:  wpradio.com
+ * Plugin URI:  https://wpradio.princeboss.com
  * Description: Worldwide Radio station directory to listen live radio streaming.
- * Version:     2.0.0
+ * Version:     2.0.1
  * Author:      Prince Ahmed
- * Author URI:  http://princeahmed.me
- * Donate link: http://princeahmed.me
- * License:     GPLv2+
+ * Author URI:  http://princeboss.com
  * Text Domain: wp-radio
  * Domain Path: /languages/
- */
-
-/**
- * Copyright (c) 2018 wpradio (email : support@wpradio.com)
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General frontend License, version 2 or, at
- * your discretion, any later version, as published by the Free
- * Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General frontend License for more details.
- *
- * You should have received a copy of the GNU General frontend License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 // don't call the file directly
 if ( ! defined( 'ABSPATH' ) ) {
-	wp_die( __( 'Hey, Silly man, You can\'t acces this page', 'wp-radio' ) );
-};
+	wp_die( __( 'You can\'t access this page', 'wp-radio' ) );
+}
 
 
 /**
@@ -41,19 +22,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-
-/**
- * Main WP_Radio Class.
- *
- * @class WP_Radio
- */
 final class WP_Radio {
 	/**
 	 * WP_Radio version.
 	 *
 	 * @var string
 	 */
-	public $version = '2.0.0';
+	public $version = '2.0.1';
 
 	/**
 	 * Minimum PHP version required
@@ -70,75 +45,8 @@ final class WP_Radio {
 	 */
 	protected static $instance = null;
 
-
-	/**
-	 * Holds various class instances
-	 *
-	 * @var array
-	 */
-	private $container = array();
-
-	/**
-	 * Main WP_Radio Instance.
-	 *
-	 * Ensures only one instance of WP_Radio is loaded or can be loaded.
-	 *
-	 * @return WP_Radio - Main instance.
-	 * @since 1.0.0
-	 * @static
-	 */
-	static function instance() {
-
-		if ( is_null( self::$instance ) ) {
-			self::$instance = new self();
-			self::$instance->setup();
-		}
-
-		return self::$instance;
-	}
-
-	/**
-	 * Cloning is forbidden.
-	 *
-	 * @since 1.0
-	 */
-	function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cloning is forbidden.', 'wp-radio' ), '1.0.0' );
-	}
-
-	/**
-	 * Unserializing instances of this class is forbidden.
-	 *
-	 * @since 1.0
-	 */
-	function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Unserializing instances of this class is forbidden.', 'wp-radio' ), '1.0.0' );
-	}
-
-	/**
-	 * Magic getter to bypass referencing plugin.
-	 *
-	 * @param $prop
-	 *
-	 * @return mixed
-	 */
-	function __get( $prop ) {
-		if ( array_key_exists( $prop, $this->container ) ) {
-			return $this->container[ $prop ];
-		}
-
-		return $this->{$prop};
-	}
-
-	/**
-	 * Magic isset to bypass referencing plugin.
-	 *
-	 * @param $prop
-	 *
-	 * @return mixed
-	 */
-	function __isset( $prop ) {
-		return isset( $this->{$prop} ) || isset( $this->container[ $prop ] );
+	public function __construct() {
+		self::setup();
 	}
 
 	/**
@@ -178,6 +86,10 @@ final class WP_Radio {
 		define( 'WP_RADIO_URL', plugins_url( '', WP_RADIO_FILE ) );
 		define( 'WP_RADIO_ASSETS_URL', WP_RADIO_URL . '/assets' );
 		define( 'WP_RADIO_TEMPLATES_DIR', WP_RADIO_PATH . '/templates' );
+
+		define( 'WP_RADIO_PRICING', admin_url( 'edit.php?post_type=wp_radio&page=wp-radio-pricing' ) );
+		define( 'WP_RADIO_CONTACT', admin_url( 'edit.php?post_type=wp_radio&page=wp-radio-contact' ) );
+		define( 'WP_RADIO_SUPPORT', admin_url( 'edit.php?post_type=wp_radio&page=wp-radio-wp-support-forum' ) );
 	}
 
 
@@ -206,12 +118,13 @@ final class WP_Radio {
 	 * Include required core files used in admin and on the frontend.
 	 */
 	function includes() {
+		//freemius
+		include_once WP_RADIO_INCLUDES . '/freemius.php';
+
 		//core includes
-		include_once WP_RADIO_INCLUDES . '/class-install.php';
 		include_once WP_RADIO_INCLUDES . '/core-functions.php';
 		include_once WP_RADIO_INCLUDES . '/hook-functions.php';
 		include_once WP_RADIO_INCLUDES . '/class-post-types.php';
-		include_once WP_RADIO_INCLUDES . '/class-widget.php';
 		include_once WP_RADIO_INCLUDES . '/prince-settings/prince-loader.php';
 		include_once WP_RADIO_INCLUDES . '/script-functions.php';
 
@@ -225,9 +138,12 @@ final class WP_Radio {
 
 		//frontend includes
 		if ( $this->is_request( 'frontend' ) ) {
-			include_once WP_RADIO_INCLUDES . '/template-functions.php';
 			include_once WP_RADIO_INCLUDES . '/class-shortcode.php';
 			include_once WP_RADIO_INCLUDES . '/class-ajax.php';
+
+			if ( in_array( get_template(), array( 'twentynineteen', 'twentyseventeen' ) ) ) {
+				include_once WP_RADIO_INCLUDES . '/class-theme-support.php';
+			}
 		}
 
 	}
@@ -243,6 +159,8 @@ final class WP_Radio {
 
 		//action_links
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
+
+		register_activation_hook( __FILE__, array( $this, 'create_radios_page' ) );
 	}
 
 	/**
@@ -257,6 +175,24 @@ final class WP_Radio {
 	}
 
 	/**
+	 * Create Base Radios page
+	 *
+	 * @since 2.1.0
+	 */
+	function create_radios_page() {
+		if ( get_page_by_title( 'Radios' ) ) {
+			return;
+		}
+
+		wp_insert_post( array(
+			'post_type'   => 'page',
+			'post_title'  => __( 'Radios', 'wp-radio' ),
+			'post_status' => 'publish',
+		) );
+
+	}
+
+	/**
 	 * Plugin action links
 	 *
 	 * @param array $links
@@ -264,11 +200,29 @@ final class WP_Radio {
 	 * @return array
 	 */
 	function plugin_action_links( $links ) {
-		$links[] = '<a href="' . admin_url( 'edit.php?post_type=wp_radio&page=import-stations' ) . '">' . __( 'Import Stations', 'wp-radio' ) . '</a>';
-		$links[] = '<a href="https://wordpress.org/support/plugin/wp-radio/" target="_blank">' . __( 'Support', 'wp-radio' ) . '</a>';
+		$links[] = '<a href="' . admin_url( 'edit.php?post_type=wp_radio&page=import-stations' ) . '">' . __( 'Import', 'wp-radio' ) . '</a>';
 
 		return $links;
 	}
+
+	/**
+	 * Main WP_Radio Instance.
+	 *
+	 * Ensures only one instance of WP_Radio is loaded or can be loaded.
+	 *
+	 * @return WP_Radio - Main instance.
+	 * @since 1.0.0
+	 * @static
+	 */
+	static function instance() {
+
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
 
 }
 
@@ -278,5 +232,3 @@ function wp_radio() {
 
 //fire off the plugin
 wp_radio();
-
-

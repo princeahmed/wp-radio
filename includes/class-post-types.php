@@ -39,7 +39,7 @@ class Post_Types {
 			'show_in_menu'        => true,
 			'show_in_nav_menus'   => true,
 			'menu_position'       => 5,
-			'menu_icon'           => WP_RADIO_ASSETS_URL . '/wp-radio-icon-w20.png',
+			'menu_icon'           => WP_RADIO_ASSETS_URL . '/images/wp-radio-icon-w20.png',
 			'publicly_queryable'  => true,
 			'exclude_from_search' => false,
 			'has_archive'         => false,

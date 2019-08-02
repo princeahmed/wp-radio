@@ -1674,6 +1674,7 @@ if ( ! function_exists( 'prince_type_on_off' ) ) {
 		/* turns arguments array into variables */
 		extract( $args );
 
+
 		/* verify a description */
 		$has_desc = $field_desc ? true : false;
 
@@ -1744,12 +1745,15 @@ if ( ! function_exists( 'prince_type_on_off' ) ) {
 		 */
 		$switch_width = apply_filters( 'prince_on_off_switch_width', '100px', $field_id );
 
-		echo '<div class="on-off-switch"' . ( $switch_width != '100px' ? sprintf( ' style="width:%s"', $switch_width ) : '' ) . '>';
+		$disabled = !empty($field_class) && $field_class == 'disabled' ? 'disabled' : '';
+
+		echo '<div class="on-off-switch '.$disabled.'"' . ( $switch_width != '100px' ? sprintf( ' style="width:%s"', $switch_width ) : '' ) . '>';
 
 		/* build radio */
 		foreach ( (array) $field_choices as $key => $choice ) {
+
 			echo '
-            <input type="radio" name="' . esc_attr( $field_name ) . '" id="' . esc_attr( $field_id ) . '-' . esc_attr( $key ) . '" value="' . esc_attr( $choice['value'] ) . '"' . checked( $field_value, $choice['value'], false ) . ' class="radio prince-ui-radio ' . esc_attr( $field_class ) . '" />
+            <input type="radio" '.$disabled.' name="' . esc_attr( $field_name ) . '" id="' . esc_attr( $field_id ) . '-' . esc_attr( $key ) . '" value="' . esc_attr( $choice['value'] ) . '"' . checked( $field_value, $choice['value'], false ) . ' class="radio prince-ui-radio ' . esc_attr( $field_class ) . '" />
             <label for="' . esc_attr( $field_id ) . '-' . esc_attr( $key ) . '" onclick="">' . esc_attr( $choice['label'] ) . '</label>';
 		}
 

@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') || exit();
+defined( 'ABSPATH' ) || exit();
 
 /**
  * Initialize the custom Settings.
@@ -34,6 +34,11 @@ function wp_radio_settings() {
 
 		'sections' => array(
 			array(
+				'id'    => 'page',
+				'icon'  => 'dashicons dashicons-format-aside',
+				'title' => __( 'Page Settings', 'wp-radio' )
+			),
+			array(
 				'id'    => 'layout',
 				'icon'  => 'dashicons dashicons-layout',
 				'title' => __( 'Layout', 'wp-radio' )
@@ -41,6 +46,24 @@ function wp_radio_settings() {
 
 		),
 		'settings' => array(
+			//pages
+			array(
+				'id'      => 'radios_page',
+				'label'   => __( 'Radios Page', 'wp_radio' ),
+				'desc'    => __( 'Choose the radios base page', 'wp_radio' ),
+				'std'     => get_page_by_title( 'Radios' ) ? get_page_by_title( 'Radios' )->ID : '',
+				'type'    => 'page-select',
+				'section' => 'page'
+			),
+			array(
+				'id'      => 'page_sidebar',
+				'label'   => __( 'Page Sidebar', 'wp_radio' ),
+				'desc'    => __( 'Choose the sidebar for the radios base page. Select none if you don\'t want to show the sidebar', 'wp_radio' ),
+				'std'     => 'sidebar-1',
+				'type'    => 'sidebar-select',
+				'section' => 'page'
+			),
+
 			//layout
 			array(
 				'id'      => 'template_layout',
@@ -50,8 +73,14 @@ function wp_radio_settings() {
 				'type'    => 'radio-image',
 				'section' => 'layout'
 			),
-
-
+			array(
+				'id'      => 'country_list_hidden',
+				'label'   => __( 'Hide Country List', 'wp_radio' ),
+				'desc'    => __( 'Hide the country sidebar list in the country and genres archive page and show only the radio stations in the country & genres archive page.', 'wp_radio' ),
+				'std'     => 'on',
+				'type'    => 'on_off',
+				'section' => 'layout'
+			),
 		)
 	);
 

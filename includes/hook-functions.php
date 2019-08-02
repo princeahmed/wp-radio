@@ -51,7 +51,9 @@ add_filter( 'prince_settings_parent_slug', function () {
  */
 function wp_radio_listing_page_template( $template ) {
 
-	if ( is_tax( 'radio_country' ) || is_tax( 'radio_genre' ) ) {
+	if ( is_page( prince_get_option( 'radios_page' ) ) ) {
+		$template = wp_radio_get_template( 'listing/listing-page' );
+	} elseif ( is_tax( 'radio_country' ) || is_tax( 'radio_genre' ) ) {
 		$template = wp_radio_get_template( 'listing/listing-page-template' );
 	} elseif ( is_singular( 'wp_radio' ) ) {
 		$template = wp_radio_get_template( 'single' );
@@ -241,7 +243,7 @@ add_action( 'pre_get_posts', 'wp_radio_country_posts' );
  *
  */
 function wp_radio_settings_page_logo( $html ) {
-	return '<a href="http://wordpress.org/plugins/wp-radio" target="_blank"> <img style="position: relative; height: auto;margin-top: 3px;" src="' . WP_RADIO_ASSETS_URL . '/wp-radio-icon-w20.png"> </a>';
+	return '<a href="http://wordpress.org/plugins/wp-radio" target="_blank"> <img style="position: relative; height: auto;margin-top: 3px;" src="' . WP_RADIO_ASSETS_URL . '/images/wp-radio-icon-w20.png"> </a>';
 }
 
 add_filter( 'prince_header_logo_link', 'wp_radio_settings_page_logo' );
@@ -293,13 +295,98 @@ function wp_radio_template_layout_images( $choices, $field_id ) {
 
 add_filter( 'prince_radio_images', 'wp_radio_template_layout_images', 10, 2 );
 
-add_action( 'edit_form_top', 'wp_radio_add_support_link' );
+//============Filter Previous/ Next Station Link
 
-function wp_radio_add_support_link( $post ) {
-	if ( ! 'wp_radio' == get_post_type( $post ) ) {
-		return;
+function wp_radio_filter_prev_next_post_join( $join ) {
+	global $post, $wpdb;
+	if ( get_post_type( $post ) == 'wp_radio' ) {
+		$join = " INNER JOIN $wpdb->term_relationships AS tr ON p.ID = tr.object_id INNER JOIN $wpdb->term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id";
 	}
-	?>
-    Having problem? Contact plugin <a href="https://wordpress.org/support/plugin/wp-radio/" target="_blank">Support</a>
-	<?php
+
+	return $join;
 }
+
+function wp_radio_filter_next_post_sort( $sort ) {
+	global $post;
+	if ( get_post_type( $post ) == 'wp_radio' ) {
+		$sort = "ORDER BY p.post_title ASC LIMIT 1";
+	}
+
+	return $sort;
+}
+
+function wp_radio_filter_next_post_where( $where ) {
+	global $post, $wpdb;
+
+	if ( get_post_type( $post ) == 'wp_radio' ) {
+		$where = $wpdb->prepare( "WHERE p.post_title > '%s' AND p.post_type = '" . get_post_type( $post ) . "' AND p.post_status = 'publish'", $post->post_title );
+
+		$term_array = wp_get_object_terms( $post->ID, 'radio_country', array( 'fields' => 'ids' ) );
+		$term_array = array_map( 'intval', $term_array );
+
+		if ( ! $term_array || is_wp_error( $term_array ) ) {
+			return '';
+		}
+
+		$where .= ' AND tt.term_id IN (' . implode( ',', $term_array ) . ')';
+	}
+
+	return $where;
+}
+
+function wp_radio_filter_previous_post_sort( $sort ) {
+	global $post;
+
+	if ( get_post_type( $post ) == 'wp_radio' ) {
+		$sort = "ORDER BY p.post_title DESC LIMIT 1";
+	}
+
+	return $sort;
+}
+
+function wp_radio_filter_previous_post_where( $where ) {
+	global $post, $wpdb;
+
+	if ( get_post_type( $post ) == 'wp_radio' ) {
+		$where = $wpdb->prepare( "WHERE p.post_title < '%s' AND p.post_type = '" . get_post_type( $post ) . "' AND p.post_status = 'publish'", $post->post_title );
+
+		$term_array = wp_get_object_terms( $post->ID, 'radio_country', array( 'fields' => 'ids' ) );
+		$term_array = array_map( 'intval', $term_array );
+
+		if ( ! $term_array || is_wp_error( $term_array ) ) {
+			return '';
+		}
+
+		$where .= ' AND tt.term_id IN (' . implode( ',', $term_array ) . ')';
+	}
+
+	return $where;
+}
+
+add_filter( 'get_previous_post_join', 'wp_radio_filter_prev_next_post_join' );
+add_filter( 'get_next_post_join', 'wp_radio_filter_prev_next_post_join' );
+
+add_filter( 'get_next_post_sort', 'wp_radio_filter_next_post_sort' );
+add_filter( 'get_previous_post_sort', 'wp_radio_filter_previous_post_sort' );
+
+add_filter( 'get_next_post_where', 'wp_radio_filter_next_post_where' );
+add_filter( 'get_previous_post_where', 'wp_radio_filter_previous_post_where' );
+
+//filter body class
+function wp_radio_filter_body_class( $classes ) {
+	global $post;
+
+	if ( ( is_page() && has_shortcode( $post->post_content, 'wp_radio_listing' ) )
+	     || 'wp_radio' == get_post_type( $post )
+	     || is_tax( 'radio_country' )
+	     || is_tax( 'radio_genre' )
+	     || is_page( prince_get_option('radios_page') )
+	) {
+		$classes[] = 'wp-radio';
+	}
+
+	return $classes;
+}
+
+add_filter( 'body_class', 'wp_radio_filter_body_class' );
+

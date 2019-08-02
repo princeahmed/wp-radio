@@ -5,7 +5,7 @@ namespace Prince\WP_Radio\Admin;
 
 defined( 'ABSPATH' ) || exit();
 
-include WP_RADIO_INCLUDES . '/admin/class-import-stations.php';
+include WP_RADIO_INCLUDES . '/admin/class-importer.php';
 
 class Ajax {
 
@@ -16,8 +16,9 @@ class Ajax {
 	function handle_import() {
 
 		$countries = ! empty( $_REQUEST['countries'] ) ? $_REQUEST['countries'] : '';
+		$update = $_REQUEST['update'] ? (bool) $_REQUEST['update'] : false;
 
-		$importer = new Importer( $countries );
+		$importer = new Importer( $countries, $update );
 
 		$response = $importer->handle_import();
 

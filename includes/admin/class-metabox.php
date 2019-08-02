@@ -7,11 +7,11 @@ defined( 'ABSPATH' ) || exit();
 
 /**
  * Class MetaBox
- * 
+ *
  * Handle metaboxes
- * 
+ *
  * @package Prince\WP_Radio
- * 
+ *
  * @since 1.0.0
  */
 class MetaBox {
@@ -43,115 +43,129 @@ class MetaBox {
 
 		$metaboxes = [];
 
-		$metaboxes[] = array(
+		$metaboxes['wp_radio_metabox'] = array(
 			'id'       => 'wp_radio_metabox',
 			'title'    => __( 'Station Information', 'wp-radio' ),
 			//'desc'     => __( 'Add Additional Information for the radio station', 'wp-radio' ),
 			'pages'    => array( 'wp_radio' ),
 			'context'  => 'normal',
 			'priority' => 'high',
-			'fields'   => array(
-				array(
-					'id'    => 'stream-url-tab',
-					'label' => __( 'Stream URL', 'wp-radio' ),
-					'type'  => 'tab',
-				),
-
-				array(
-					'label' => __( 'Station Stream URL', 'wp-radio' ),
-					'id'    => 'stream_url',
-					'type'  => 'text',
-					'desc'  => sprintf( __( 'Enter the %s of the radio station', 'wp-radio' ), '<code>Live Stream URL</code>' ),
-					'attrs' => array(
-						'placeholder' => 'Stream URL'
+			'fields'   => apply_filters( 'wp_radio_metabox_fields', array(
+					'general-tab' => array(
+						'id'    => 'general-tab',
+						'label' => __( 'General', 'wp-radio' ),
+						'type'  => 'tab',
 					),
-				),
 
-				array(
-					'id'    => 'references-tab',
-					'label' => __( 'Station References', 'wp-radio' ),
-					'desc'  => __( 'The references of the Radio Station', 'wp-radio' ),
-					'type'  => 'tab',
-				),
-
-				array(
-					'id'      => 'language',
-					'label'   => __( 'Station Language', 'wp-radio' ),
-					'desc'    => __( 'Select the language of the radio station', 'wp-radio' ),
-					'type'    => 'select',
-					'choices' => wp_radio_get_language(),
-				),
-
-				array(
-					'id'    => 'social-links',
-					'label' => __( 'Station Social Links', 'wp-radio' ),
-					'desc'  => __( 'Add station website, social links', 'wp-radio' ),
-					'type'  => 'social-links',
-					'std'   => array(
-						array(
-							'name'  => __( 'Website', 'wp-radio' ),
-							'title' => '',
-							'href'  => ''
-						),
-						array(
-							'name'  => __( 'Facebook', 'wp-radio' ),
-							'title' => '',
-							'href'  => ''
-						),
-						array(
-							'name'  => __( 'Twitter', 'wp-radio' ),
-							'title' => '',
-							'href'  => ''
-						),
-						array(
-							'name'  => __( 'Wikipedia', 'wp-radio' ),
-							'title' => '',
-							'href'  => ''
+					'stream_url' => array(
+						'label' => __( 'Station Stream URL', 'wp-radio' ),
+						'id'    => 'stream_url',
+						'type'  => 'text',
+						'desc'  => sprintf( __( 'Enter the %s of the radio station', 'wp-radio' ), '<code>Live Stream URL</code>' ),
+						'attrs' => array(
+							'placeholder' => 'Stream URL'
 						),
 					),
-				),
 
-				array(
-					'id'    => 'station-contacts-tab',
-					'label' => __( 'Station Contacts', 'wp-radio' ),
-					'type'  => 'tab',
-					'std'   => '',
-				),
 
-				array(
-					'id'    => 'contact_address',
-					'label' => __( 'Station Address', 'wp-radio' ),
-					'desc'  => __( 'Contact address of the Radio station', 'wp-radio' ),
-					'type'  => 'textarea_simple',
-					'rows'  => 2,
-				),
+					'featured' => array(
+						'label' => __( 'Featured Station', 'wp-radio' ),
+						'id'    => 'featured',
+						'type'  => 'on_off',
+						'desc'  => sprintf( '%s %s',
+							__( 'Turn ON, to featured this station. Get the featured stations by using <code>[wp_radio_featured]</code> shortcode.', 'wp-radio' ),
+							!wr_fs()->can_use_premium_code__premium_only() ? __( 'This feature is only available in <strong>Premium</strong> version.', 'wp-radio' ) : ''
+						),
+						'std'   => 'off',
+						'class' => 'disabled',
+					),
 
-				array(
-					'id'    => 'contact_email',
-					'label' => __( 'Email', 'wp-radio' ),
-					'desc'  => __( 'Contact email of the Radio Station', 'wp-radio' ),
-					'type'  => 'text',
-				),
+					'references-tab' => array(
+						'id'    => 'references-tab',
+						'label' => __( 'Station References', 'wp-radio' ),
+						'desc'  => __( 'The references of the Radio Station', 'wp-radio' ),
+						'type'  => 'tab',
+					),
 
-				array(
-					'id'    => 'contact_phone',
-					'label' => __( 'Phone', 'wp-radio' ),
-					'desc'  => __( 'Contact phone number of the Radio Station', 'wp-radio' ),
-					'type'  => 'text',
-				),
+					'language' => array(
+						'id'      => 'language',
+						'label'   => __( 'Station Language', 'wp-radio' ),
+						'desc'    => __( 'Select the language of the radio station', 'wp-radio' ),
+						'type'    => 'select',
+						'choices' => wp_radio_get_language(),
+					),
 
-				array(
-					'id'    => 'contact_additional',
-					'label' => __( 'Additional Contacts Info', 'wp-radio' ),
-					'desc'  => sprintf( __( 'You can enter additional contact information here with basic %s.', 'wp-radio' ), '<code>HTML</code>' ),
-					'type'  => 'textarea',
-				),
+					'social-links' => array(
+						'id'    => 'social-links',
+						'label' => __( 'Station Social Links', 'wp-radio' ),
+						'desc'  => __( 'Add station website, social links', 'wp-radio' ),
+						'type'  => 'social-links',
+						'std'   => array(
+							array(
+								'name'  => __( 'Website', 'wp-radio' ),
+								'title' => '',
+								'href'  => ''
+							),
+							array(
+								'name'  => __( 'Facebook', 'wp-radio' ),
+								'title' => '',
+								'href'  => ''
+							),
+							array(
+								'name'  => __( 'Twitter', 'wp-radio' ),
+								'title' => '',
+								'href'  => ''
+							),
+							array(
+								'name'  => __( 'Wikipedia', 'wp-radio' ),
+								'title' => '',
+								'href'  => ''
+							),
+						),
+					),
 
+					'station-contacts-tab' => array(
+						'id'    => 'station-contacts-tab',
+						'label' => __( 'Station Contacts', 'wp-radio' ),
+						'type'  => 'tab',
+						'std'   => '',
+					),
+
+					'contact_address' => array(
+						'id'    => 'contact_address',
+						'label' => __( 'Station Address', 'wp-radio' ),
+						'desc'  => __( 'Contact address of the Radio station', 'wp-radio' ),
+						'type'  => 'textarea_simple',
+						'rows'  => 2,
+					),
+
+					'contact_email' => array(
+						'id'    => 'contact_email',
+						'label' => __( 'Email', 'wp-radio' ),
+						'desc'  => __( 'Contact email of the Radio Station', 'wp-radio' ),
+						'type'  => 'text',
+					),
+
+					'contact_phone' => array(
+						'id'    => 'contact_phone',
+						'label' => __( 'Phone', 'wp-radio' ),
+						'desc'  => __( 'Contact phone number of the Radio Station', 'wp-radio' ),
+						'type'  => 'text',
+					),
+
+					'contact_additional' => array(
+						'id'    => 'contact_additional',
+						'label' => __( 'Additional Contacts Info', 'wp-radio' ),
+						'desc'  => sprintf( __( 'You can enter additional contact information here with basic %s.', 'wp-radio' ), '<code>HTML</code>' ),
+						'type'  => 'textarea',
+					),
+
+				)
 			)
 
 		);
 
-		$metaboxes[] = array(
+		$metaboxes['wp_radio_image_metabox'] = array(
 			'id'       => 'wp_radio_image_metabox',
 			'title'    => __( 'Station Image', 'wp-radio' ),
 			'desc'     => __( 'Enter URL or Upload the station Image', 'wp-radio' ),
@@ -180,9 +194,9 @@ class MetaBox {
 	 * @param $true
 	 * @param $field_id
 	 *
+	 * @return bool
 	 * @since 1.0.0
 	 *
-	 * @return bool
 	 */
 	function wp_editor_media_buttons( $true, $field_id ) {
 
@@ -200,9 +214,9 @@ class MetaBox {
 	 * @param $true
 	 * @param $field_id
 	 *
+	 * @return bool
 	 * @since 1.0.0
 	 *
-	 * @return bool
 	 */
 	function wp_editor_tinymce( $true, $field_id ) {
 		if ( 'additional' == $field_id ) {
